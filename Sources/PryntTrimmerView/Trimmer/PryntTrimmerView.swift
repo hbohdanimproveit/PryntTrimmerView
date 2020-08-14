@@ -33,12 +33,30 @@ public protocol TrimmerViewDelegate: class {
     }
 
     /// The color of the handles on the side of the view
-    @IBInspectable public var handleColor: UIColor = UIColor.gray {
+    @IBInspectable public var leftHandleColor: UIColor = UIColor.blue {
         didSet {
-           updateHandleColor()
+           leftHandleKnob.backgroundColor = leftHandleColor
         }
     }
-
+    
+    /// The color of the handles on the side of the view
+    @IBInspectable public var rightHandleColor: UIColor = UIColor.gray {
+        didSet {
+           rightHandleKnob.backgroundColor = rightHandleColor
+        }
+    }
+    
+    /// The bool for handles appearance on the side of the view
+    @IBInspectable public var isHiddenHandleViews: Bool = false {
+        didSet {
+            rightHandleView.isHidden = isHiddenHandleViews
+            leftHandleView.isHidden = isHiddenHandleViews
+            leftHandleKnob.isHidden = isHiddenHandleViews
+            rightHandleKnob.isHidden = isHiddenHandleViews
+            trimView.isHidden = isHiddenHandleViews
+        }
+    }
+    
     /// The color of the position indicator
     @IBInspectable public var positionBarColor: UIColor = UIColor.white {
         didSet {
@@ -96,7 +114,6 @@ public protocol TrimmerViewDelegate: class {
         setupPositionBar()
         setupGestures()
         updateMainColor()
-        updateHandleColor()
     }
 
     override func constrainAssetPreview() {
@@ -214,11 +231,6 @@ public protocol TrimmerViewDelegate: class {
         trimView.layer.borderColor = mainColor.cgColor
         leftHandleView.backgroundColor = mainColor
         rightHandleView.backgroundColor = mainColor
-    }
-
-    private func updateHandleColor() {
-        leftHandleKnob.backgroundColor = handleColor
-        rightHandleKnob.backgroundColor = handleColor
     }
 
     // MARK: - Trim Gestures
