@@ -81,7 +81,7 @@ public protocol TrimmerViewDelegate: class {
     private let trimView = UIView()
     private let leftHandleView = HandlerView()
     private let rightHandleView = HandlerView()
-    private let positionBar = UIView()
+    private let positionBar = HandlerView()
     private let leftHandleKnob = UIView()
     private let rightHandleKnob = UIView()
     private let leftMaskView = UIView()
@@ -89,8 +89,9 @@ public protocol TrimmerViewDelegate: class {
 
     // MARK: Constraints
 
-    private var currentLeftConstraint: CGFloat = 0
-    private var currentRightConstraint: CGFloat = 0
+    private var currentLeftConstraint: CGFloat = .zero
+    private var currentRightConstraint: CGFloat = .zero
+    private var currentPositionBarConstraint: CGFloat = .zero
     private var leftConstraint: NSLayoutConstraint?
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
@@ -180,8 +181,8 @@ public protocol TrimmerViewDelegate: class {
     private func setupMaskView() {
 
         leftMaskView.isUserInteractionEnabled = false
-        leftMaskView.backgroundColor = .white
-        leftMaskView.alpha = 0.7
+        leftMaskView.backgroundColor = .black
+        leftMaskView.alpha = 0.4
         leftMaskView.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(leftMaskView, belowSubview: leftHandleView)
 
@@ -191,8 +192,8 @@ public protocol TrimmerViewDelegate: class {
         leftMaskView.rightAnchor.constraint(equalTo: leftHandleView.centerXAnchor).isActive = true
 
         rightMaskView.isUserInteractionEnabled = false
-        rightMaskView.backgroundColor = .white
-        rightMaskView.alpha = 0.7
+        rightMaskView.backgroundColor = .black
+        rightMaskView.alpha = 0.4
         rightMaskView.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(rightMaskView, belowSubview: rightHandleView)
 
@@ -225,6 +226,9 @@ public protocol TrimmerViewDelegate: class {
         leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
         let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
         rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
+        
+        let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+               positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
     }
 
     private func updateMainColor() {
@@ -236,32 +240,58 @@ public protocol TrimmerViewDelegate: class {
     // MARK: - Trim Gestures
 
     @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
-        guard let view = gestureRecognizer.view, let superView = gestureRecognizer.view?.superview else { return }
-        let isLeftGesture = view == leftHandleView
+        guard let view = gestureRecognizer.view,
+            let superView = gestureRecognizer.view?.superview else { return }
+        
         switch gestureRecognizer.state {
-
         case .began:
-            if isLeftGesture {
+            switch view {
+            case leftHandleView:
                 currentLeftConstraint = leftConstraint!.constant
-            } else {
+            case rightHandleView:
                 currentRightConstraint = rightConstraint!.constant
+            case positionBar:
+                currentPositionBarConstraint = positionConstraint!.constant
+                
+            default:
+                break
             }
+            
             updateSelectedTime(stoppedMoving: false)
         case .changed:
             let translation = gestureRecognizer.translation(in: superView)
-            if isLeftGesture {
+            switch view {
+            case leftHandleView:
                 updateLeftConstraint(with: translation)
-            } else {
+            case rightHandleView:
                 updateRightConstraint(with: translation)
+            case positionBar:
+                updatePositionConstraint(with: translation)
+            default:
+                break
             }
+            
             layoutIfNeeded()
-            if let startTime = startTime, isLeftGesture {
-                seek(to: startTime)
-            } else if let endTime = endTime {
-                seek(to: endTime)
+            
+            switch view {
+            case leftHandleView:
+                if let startTime = startTime {
+                    seek(to: startTime)
+                }
+            case rightHandleView:
+                if let endTime = endTime {
+                    seek(to: endTime)
+                }
+            case positionBar:
+                if let startTime = thumbTime {
+                    seek(to: startTime)
+                }
+            default:
+                break
             }
+            
             updateSelectedTime(stoppedMoving: false)
-
+            
         case .cancelled, .ended, .failed:
             updateSelectedTime(stoppedMoving: true)
         default: break
@@ -278,6 +308,12 @@ public protocol TrimmerViewDelegate: class {
         let maxConstraint = min(2 * handleWidth - frame.width + leftHandleView.frame.origin.x + minimumDistanceBetweenHandle, 0)
         let newConstraint = max(min(0, currentRightConstraint + translation.x), maxConstraint)
         rightConstraint?.constant = newConstraint
+    }
+    
+    private func updatePositionConstraint(with translation: CGPoint) {
+        let maxConstraint = max(rightHandleView.frame.origin.x - handleWidth, 0)
+        let newConstraint = min(max(0, currentPositionBarConstraint + translation.x), maxConstraint)
+        positionConstraint?.constant = newConstraint
     }
 
     // MARK: - Asset loading
@@ -318,6 +354,11 @@ public protocol TrimmerViewDelegate: class {
     public var endTime: CMTime? {
         let endPosition = rightHandleView.frame.origin.x + assetPreview.contentOffset.x - handleWidth
         return getTime(from: endPosition)
+    }
+    
+    public var thumbTime: CMTime? {
+        let thumbPosition = positionBar.frame.origin.x - handleWidth
+        return getTime(from: thumbPosition)
     }
 
     private func updateSelectedTime(stoppedMoving: Bool) {
