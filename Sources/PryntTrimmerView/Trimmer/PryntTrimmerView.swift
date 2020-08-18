@@ -57,6 +57,14 @@ public protocol TrimmerViewDelegate: class {
         }
     }
     
+    /// The bool for handles user interaction
+    @IBInspectable public var isHandlesEnabled: Bool = true {
+        didSet {
+            rightHandleView.isUserInteractionEnabled = isHandlesEnabled
+            leftHandleView.isUserInteractionEnabled = isHandlesEnabled
+        }
+    }
+    
     /// The color of the position indicator
     @IBInspectable public var positionBarColor: UIColor = UIColor.white {
         didSet {
@@ -141,7 +149,7 @@ public protocol TrimmerViewDelegate: class {
 
     private func setupHandleView() {
 
-        leftHandleView.isUserInteractionEnabled = true
+        leftHandleView.isUserInteractionEnabled = isHandlesEnabled
         leftHandleView.layer.cornerRadius = 2.0
         leftHandleView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(leftHandleView)
@@ -159,7 +167,7 @@ public protocol TrimmerViewDelegate: class {
         leftHandleKnob.centerYAnchor.constraint(equalTo: leftHandleView.centerYAnchor).isActive = true
         leftHandleKnob.centerXAnchor.constraint(equalTo: leftHandleView.centerXAnchor).isActive = true
 
-        rightHandleView.isUserInteractionEnabled = true
+        rightHandleView.isUserInteractionEnabled = isHandlesEnabled
         rightHandleView.layer.cornerRadius = 2.0
         rightHandleView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(rightHandleView)
