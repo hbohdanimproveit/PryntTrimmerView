@@ -21,11 +21,6 @@ public protocol TrimmerViewDelegate: class {
 // range
 @IBDesignable public class TrimmerView: AVAssetTimeSelector {
     
-    enum TrimmerViewType {
-        case videoPlayer
-        case videoEditor
-    }
-    
     // MARK: - Properties
 
     // MARK: Color Customization
@@ -70,7 +65,7 @@ public protocol TrimmerViewDelegate: class {
     }
     
     /// The type of trimmer view
-    @IBInspectable public var trimmerViewType: TrimmerViewType = .videoEditor
+    @IBInspectable public var isTrimmerEnabled: Bool = true
 
     /// The color used to mask unselected parts of the video
     @IBInspectable public var maskColor: UIColor = UIColor.white {
@@ -229,20 +224,19 @@ public protocol TrimmerViewDelegate: class {
     }
 
     private func setupGestures() {
-        switch trimmerViewType {
-        case .videoEditor:
+        if isTrimmerEnabled {
             let leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-            leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
             let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-            rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
+            let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
             
+            leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
+            rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
+            positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
+        } else {
             let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-                   positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
-        case .videoPlayer:
-            let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-            positionBar.addGestureRecognizer(positionBarPanGestureReco
+            positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
         }
-    }
+}
 
     private func updateMainColor() {
         trimView.layer.borderColor = mainColor.cgColor
