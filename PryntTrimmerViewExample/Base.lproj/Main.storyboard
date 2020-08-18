@@ -29,6 +29,11 @@
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenHandleViews" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isTrimmerEnabled" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="maskColor">
+                                        <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHandlesEnabled" value="NO"/>
                                 </userDefinedRuntimeAttributes>
                             </view>
                             <view alpha="0.80000000000000004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YaM-S0-qXi" userLabel="Bottom View">

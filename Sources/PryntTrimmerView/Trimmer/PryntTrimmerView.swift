@@ -57,18 +57,23 @@ public protocol TrimmerViewDelegate: class {
         }
     }
     
+    /// The bool used to handle views user interaction
+    @IBInspectable public var isHandlesEnabled: Bool = true {
+        didSet {
+            rightHandleView.gestureRecognizers?.first?.isEnabled = isHandlesEnabled
+            leftHandleView.gestureRecognizers?.first?.isEnabled = isHandlesEnabled
+        }
+    }
+    
     /// The color of the position indicator
     @IBInspectable public var positionBarColor: UIColor = UIColor.white {
         didSet {
             positionBar.backgroundColor = positionBarColor
         }
     }
-    
-    /// The type of trimmer view
-    @IBInspectable public var isTrimmerEnabled: Bool = true
 
     /// The color used to mask unselected parts of the video
-    @IBInspectable public var maskColor: UIColor = UIColor.white {
+    @IBInspectable public var maskColor: UIColor = UIColor.black.withAlphaComponent(0.4) {
         didSet {
             leftMaskView.backgroundColor = maskColor
             rightMaskView.backgroundColor = maskColor
@@ -98,7 +103,7 @@ public protocol TrimmerViewDelegate: class {
     private var leftConstraint: NSLayoutConstraint?
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
-
+    private var isHandlesViewEnabled: Bool = false
     private let handleWidth: CGFloat = 15
 
     /// The minimum duration allowed for the trimming. The handles won't pan further if the minimum duration is attained.
@@ -184,8 +189,8 @@ public protocol TrimmerViewDelegate: class {
     private func setupMaskView() {
 
         leftMaskView.isUserInteractionEnabled = false
-        leftMaskView.backgroundColor = .black
-        leftMaskView.alpha = 0.4
+        leftMaskView.backgroundColor = maskColor
+
         leftMaskView.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(leftMaskView, belowSubview: leftHandleView)
 
@@ -195,8 +200,7 @@ public protocol TrimmerViewDelegate: class {
         leftMaskView.rightAnchor.constraint(equalTo: leftHandleView.centerXAnchor).isActive = true
 
         rightMaskView.isUserInteractionEnabled = false
-        rightMaskView.backgroundColor = .black
-        rightMaskView.alpha = 0.4
+        rightMaskView.backgroundColor = maskColor
         rightMaskView.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(rightMaskView, belowSubview: rightHandleView)
 
@@ -224,18 +228,18 @@ public protocol TrimmerViewDelegate: class {
     }
 
     private func setupGestures() {
-        if isTrimmerEnabled {
+//        if isHandlesViewEnabled {
             let leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
             let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
             let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-            
+
             leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
             rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
             positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
-        } else {
-            let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-            positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
-        }
+//        } else {
+//            let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+//            positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
+//        }
 }
 
     private func updateMainColor() {
