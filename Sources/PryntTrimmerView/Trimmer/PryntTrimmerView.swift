@@ -20,7 +20,12 @@ public protocol TrimmerViewDelegate: class {
 /// Load the video by setting the `asset` property. Access the `startTime` and `endTime` of the view to get the selected time
 // range
 @IBDesignable public class TrimmerView: AVAssetTimeSelector {
-
+    
+    enum TrimmerViewType {
+        case videoPlayer
+        case videoEditor
+    }
+    
     // MARK: - Properties
 
     // MARK: Color Customization
@@ -57,20 +62,15 @@ public protocol TrimmerViewDelegate: class {
         }
     }
     
-    /// The bool for handles user interaction
-    @IBInspectable public var isHandlesEnabled: Bool = true {
-        didSet {
-            rightHandleView.isUserInteractionEnabled = isHandlesEnabled
-            leftHandleView.isUserInteractionEnabled = isHandlesEnabled
-        }
-    }
-    
     /// The color of the position indicator
     @IBInspectable public var positionBarColor: UIColor = UIColor.white {
         didSet {
             positionBar.backgroundColor = positionBarColor
         }
     }
+    
+    /// The type of trimmer view
+    @IBInspectable public var trimmerViewType: TrimmerViewType = .videoEditor
 
     /// The color used to mask unselected parts of the video
     @IBInspectable public var maskColor: UIColor = UIColor.white {
@@ -149,7 +149,7 @@ public protocol TrimmerViewDelegate: class {
 
     private func setupHandleView() {
 
-        leftHandleView.isUserInteractionEnabled = isHandlesEnabled
+        leftHandleView.isUserInteractionEnabled = true
         leftHandleView.layer.cornerRadius = 2.0
         leftHandleView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(leftHandleView)
@@ -167,7 +167,7 @@ public protocol TrimmerViewDelegate: class {
         leftHandleKnob.centerYAnchor.constraint(equalTo: leftHandleView.centerYAnchor).isActive = true
         leftHandleKnob.centerXAnchor.constraint(equalTo: leftHandleView.centerXAnchor).isActive = true
 
-        rightHandleView.isUserInteractionEnabled = isHandlesEnabled
+        rightHandleView.isUserInteractionEnabled = true
         rightHandleView.layer.cornerRadius = 2.0
         rightHandleView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(rightHandleView)
@@ -229,14 +229,19 @@ public protocol TrimmerViewDelegate: class {
     }
 
     private func setupGestures() {
-
-        let leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-        leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
-        let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-        rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
-        
-        let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-               positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
+        switch trimmerViewType {
+        case .videoEditor:
+            let leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+            leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
+            let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+            rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
+            
+            let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+                   positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
+        case .videoPlayer:
+            let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+            positionBar.addGestureRecognizer(positionBarPanGestureReco
+        }
     }
 
     private func updateMainColor() {
