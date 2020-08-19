@@ -342,8 +342,7 @@ public protocol TrimmerViewDelegate: class {
         if let newPosition = getPosition(from: time) {
             
             let offsetPosition = newPosition - assetPreview.contentOffset.x - leftHandleView.frame.origin.x
-            let maxPosition = rightHandleView.frame.origin.x - (leftHandleView.frame.origin.x + handleWidth)
-                - positionBar.frame.width
+            let maxPosition = rightHandleView.frame.origin.x - (leftHandleView.frame.origin.x + handleWidth) - positionBar.frame.width
             let normalizedPosition = min(max(0, offsetPosition), maxPosition)
             self.positionConstraint?.constant = normalizedPosition
             
@@ -351,57 +350,59 @@ public protocol TrimmerViewDelegate: class {
                 self.layoutIfNeeded()
             })
         }
-        
-        /// The selected start time for the current asset.
-        public var startTime: CMTime? {
-            let startPosition = leftHandleView.frame.origin.x + assetPreview.contentOffset.x
-            return getTime(from: startPosition)
+    }
+    
+    /// The selected start time for the current asset.
+    public var startTime: CMTime? {
+        let startPosition = leftHandleView.frame.origin.x + assetPreview.contentOffset.x
+        return getTime(from: startPosition)
+    }
+    
+    /// The selected end time for the current asset.
+    public var endTime: CMTime? {
+        let endPosition = rightHandleView.frame.origin.x + assetPreview.contentOffset.x - handleWidth
+        return getTime(from: endPosition)
+    }
+    
+    public var thumbTime: CMTime? {
+        let thumbPosition = positionBar.frame.origin.x - handleWidth
+        return getTime(from: thumbPosition)
+    }
+    
+    private func updateSelectedTime(stoppedMoving: Bool) {
+        guard let playerTime = positionBarTime else {
+            return
         }
-        
-        /// The selected end time for the current asset.
-        public var endTime: CMTime? {
-            let endPosition = rightHandleView.frame.origin.x + assetPreview.contentOffset.x - handleWidth
-            return getTime(from: endPosition)
+        if stoppedMoving {
+            delegate?.positionBarStoppedMoving(playerTime)
+        } else {
+            delegate?.didChangePositionBar(playerTime)
         }
-        
-        public var thumbTime: CMTime? {
-            let thumbPosition = positionBar.frame.origin.x - handleWidth
-            return getTime(from: thumbPosition)
-        }
-        
-        private func updateSelectedTime(stoppedMoving: Bool) {
-            guard let playerTime = positionBarTime else {
-                return
-            }
-            if stoppedMoving {
-                delegate?.positionBarStoppedMoving(playerTime)
-            } else {
-                delegate?.didChangePositionBar(playerTime)
-            }
-        }
-        
-        private var positionBarTime: CMTime? {
-            let barPosition = positionBar.frame.origin.x + assetPreview.contentOffset.x - handleWidth
-            return getTime(from: barPosition)
-        }
-        
-        private var minimumDistanceBetweenHandle: CGFloat {
-            guard let asset = asset else { return 0 }
-            return CGFloat(minDuration) * assetPreview.contentView.frame.width / CGFloat(asset.duration.seconds)
-        }
-        
-        // MARK: - Scroll View Delegate
-        
-        public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    }
+    
+    private var positionBarTime: CMTime? {
+        let barPosition = positionBar.frame.origin.x + assetPreview.contentOffset.x - handleWidth
+        return getTime(from: barPosition)
+    }
+    
+    private var minimumDistanceBetweenHandle: CGFloat {
+        guard let asset = asset else { return 0 }
+        return CGFloat(minDuration) * assetPreview.contentView.frame.width / CGFloat(asset.duration.seconds)
+    }
+    
+    // MARK: - Scroll View Delegate
+    
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        updateSelectedTime(stoppedMoving: true)
+    }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
             updateSelectedTime(stoppedMoving: true)
         }
-        
-        public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-            if !decelerate {
-                updateSelectedTime(stoppedMoving: true)
-            }
-        }
-        public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            updateSelectedTime(stoppedMoving: false)
-        }
+    }
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updateSelectedTime(stoppedMoving: false)
+    }
 }
