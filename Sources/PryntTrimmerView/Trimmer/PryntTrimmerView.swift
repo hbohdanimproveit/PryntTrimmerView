@@ -228,19 +228,14 @@ public protocol TrimmerViewDelegate: class {
     }
 
     private func setupGestures() {
-//        if isHandlesViewEnabled {
-            let leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-            let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-            let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-
-            leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
-            rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
-            positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
-//        } else {
-//            let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-//            positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
-//        }
-}
+        let leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+        let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+        let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+        
+        leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
+        rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
+        positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
+    }
 
     private func updateMainColor() {
         trimView.layer.borderColor = mainColor.cgColor
