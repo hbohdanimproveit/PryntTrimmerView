@@ -347,6 +347,10 @@ public protocol TrimmerViewDelegate: class {
             self.positionConstraint?.constant = normalizedPosition
             
             UIView.animate(withDuration: 0.3, animations: {
+                guard let startTime = self.startTime,
+                    let endTime = self.endTime,
+                    time > startTime && time < endTime  else { return }
+                
                 self.layoutIfNeeded()
             })
         }
