@@ -346,7 +346,7 @@ public protocol TrimmerViewDelegate: class {
             let normalizedPosition = min(max(0, offsetPosition), maxPosition)
             self.positionConstraint?.constant = normalizedPosition
             
-            UIView.animate(withDuration: 0.1, animations: {
+            UIView.animate(withDuration: 0.3, animations: {
                 self.layoutIfNeeded()
             })
         }
