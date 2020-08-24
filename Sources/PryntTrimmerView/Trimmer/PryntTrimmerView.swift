@@ -108,6 +108,7 @@ public protocol TrimmerViewDelegate: class {
     
     /// The minimum duration allowed for the trimming. The handles won't pan further if the minimum duration is attained.
     public var minDuration: Double = 3
+    public var positionBarAnimationDuration: Double = 0.1
     
     // MARK: - View & constraints configurations
     
@@ -346,7 +347,7 @@ public protocol TrimmerViewDelegate: class {
             let normalizedPosition = min(max(0, offsetPosition), maxPosition)
             self.positionConstraint?.constant = normalizedPosition
             
-            UIView.animate(withDuration: 0.3, animations: {
+            UIView.animate(withDuration: positionBarAnimationDuration, animations: {
                 guard let startTime = self.startTime,
                     let endTime = self.endTime,
                     time > startTime && time < endTime  else { return }
