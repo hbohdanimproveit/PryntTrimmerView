@@ -155,10 +155,10 @@ public protocol TrimmerViewDelegate: class {
         backgroundColor = UIColor.clear
         layer.zPosition = 1
         setupTrimmerView()
+        setupMarksHanlderView()
         setupHandleView()
         setupMaskView()
         setupPositionBar()
-        setupMarksHanlderView()
         setupGestures()
         updateMainColor()
     }
@@ -259,9 +259,6 @@ public protocol TrimmerViewDelegate: class {
         rightMarkImageView.bottomAnchor.constraint(equalTo: rightMarkHandlerView.bottomAnchor).isActive = true
         rightMarkImageView.widthAnchor.constraint(equalToConstant: 8).isActive = true
         rightMarkImageView.centerXAnchor.constraint(equalTo: rightMarkHandlerView.centerXAnchor).isActive = true
-        
-        leftMarkHandlerView.layer.zPosition = 999
-        rightMarkHandlerView.layer.zPosition = 999
     }
     
     
