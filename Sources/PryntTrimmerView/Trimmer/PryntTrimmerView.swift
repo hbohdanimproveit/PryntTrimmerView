@@ -417,7 +417,6 @@ public protocol TrimmerViewDelegate: class {
     private func resetHandleViewPosition() {
         leftConstraint?.constant = 0
         rightConstraint?.constant = 0
-        positionConstraint?.constant = 0
         layoutIfNeeded()
     }
     
