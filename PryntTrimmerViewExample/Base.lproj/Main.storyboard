@@ -28,12 +28,13 @@
                                     <constraint firstAttribute="height" constant="56" id="e9q-qu-Rg9"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenHandleViews" value="NO"/>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isTrimmerEnabled" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenHandleViews" value="YES"/>
                                     <userDefinedRuntimeAttribute type="color" keyPath="maskColor">
-                                        <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="value" white="0.0" alpha="0.30317478549999999" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHandlesEnabled" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHandlesEnabled" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isMarksEnabled" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenMarksHandleViews" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                             </view>
                             <view alpha="0.80000000000000004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YaM-S0-qXi" userLabel="Bottom View">
@@ -69,7 +70,7 @@
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="cRa-1R-GZG" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="1LK-Oq-5a4"/>
                             <constraint firstItem="qFP-ui-lpU" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="24" id="7PE-Wt-fxy"/>

@@ -57,13 +57,32 @@ public protocol TrimmerViewDelegate: class {
         }
     }
     
+    /// The bool for marks handle appearance on the side of the view
+    @IBInspectable public var isHiddenMarksHandleViews: Bool = false {
+        didSet {
+            leftMarkHandlerView.isHidden = isHiddenMarksHandleViews
+            rightMarkHandlerView.isHidden = isHiddenMarksHandleViews
+            leftMarkImageView.isHidden = isHiddenMarksHandleViews
+            rightMarkImageView.isHidden = isHiddenMarksHandleViews
+        }
+    }
+    
     /// The bool used to handle views user interaction
     @IBInspectable public var isHandlesEnabled: Bool = true {
         didSet {
-            rightHandleView.gestureRecognizers?.first?.isEnabled = isHandlesEnabled
             leftHandleView.gestureRecognizers?.first?.isEnabled = isHandlesEnabled
+            rightHandleView.gestureRecognizers?.first?.isEnabled = isHandlesEnabled
         }
     }
+    
+    /// The bool used to mark handle views user interaction
+    @IBInspectable public var isMarksEnabled: Bool = true {
+        didSet {
+            leftMarkHandlerView.gestureRecognizers?.first?.isEnabled = isMarksEnabled
+            rightMarkHandlerView.gestureRecognizers?.first?.isEnabled = isMarksEnabled
+        }
+    }
+    
     
     /// The color of the position indicator
     @IBInspectable public var positionBarColor: UIColor = UIColor.white {
@@ -80,6 +99,19 @@ public protocol TrimmerViewDelegate: class {
         }
     }
     
+    /// The image of the left mark view
+    @IBInspectable public var leftMarkImage: UIImage = UIImage() {
+        didSet {
+            leftMarkImageView.image = leftMarkImage
+        }
+    }
+    /// The image of the right mark view
+    @IBInspectable public var rightMarkImage: UIImage = UIImage() {
+        didSet {
+            rightMarkImageView.image = rightMarkImage
+        }
+    }
+    
     // MARK: Interface
     
     public weak var delegate: TrimmerViewDelegate?
@@ -93,6 +125,10 @@ public protocol TrimmerViewDelegate: class {
     private let leftHandleKnob = UIView()
     private let rightHandleKnob = UIView()
     private let leftMaskView = UIView()
+    private let leftMarkHandlerView = HandlerView()
+    private let rightMarkHandlerView = HandlerView()
+    private let leftMarkImageView = UIImageView()
+    private let rightMarkImageView = UIImageView()
     private let rightMaskView = UIView()
     
     // MARK: Constraints
@@ -122,6 +158,7 @@ public protocol TrimmerViewDelegate: class {
         setupHandleView()
         setupMaskView()
         setupPositionBar()
+        setupMarksHanlderView()
         setupGestures()
         updateMainColor()
     }
@@ -129,8 +166,8 @@ public protocol TrimmerViewDelegate: class {
     override func constrainAssetPreview() {
         assetPreview.leftAnchor.constraint(equalTo: leftAnchor, constant: handleWidth).isActive = true
         assetPreview.rightAnchor.constraint(equalTo: rightAnchor, constant: -handleWidth).isActive = true
-        assetPreview.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        assetPreview.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        assetPreview.topAnchor.constraint(equalTo: topAnchor, constant: 9).isActive = true
+        assetPreview.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -9).isActive = true
     }
     
     private func setupTrimmerView() {
@@ -149,13 +186,12 @@ public protocol TrimmerViewDelegate: class {
     }
     
     private func setupHandleView() {
-        
         leftHandleView.isUserInteractionEnabled = true
         leftHandleView.layer.cornerRadius = 2.0
         leftHandleView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(leftHandleView)
         
-        leftHandleView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        leftHandleView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.9).isActive = true
         leftHandleView.widthAnchor.constraint(equalToConstant: handleWidth).isActive = true
         leftHandleView.leftAnchor.constraint(equalTo: trimView.leftAnchor).isActive = true
         leftHandleView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
@@ -173,7 +209,7 @@ public protocol TrimmerViewDelegate: class {
         rightHandleView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(rightHandleView)
         
-        rightHandleView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        rightHandleView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.9).isActive = true
         rightHandleView.widthAnchor.constraint(equalToConstant: handleWidth).isActive = true
         rightHandleView.rightAnchor.constraint(equalTo: trimView.rightAnchor).isActive = true
         rightHandleView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
@@ -187,8 +223,49 @@ public protocol TrimmerViewDelegate: class {
         rightHandleKnob.centerXAnchor.constraint(equalTo: rightHandleView.centerXAnchor).isActive = true
     }
     
-    private func setupMaskView() {
+    private func setupMarksHanlderView() {
+        leftMarkHandlerView.isUserInteractionEnabled = true
+        leftMarkHandlerView.layer.cornerRadius = 2.0
+        leftMarkHandlerView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(leftMarkHandlerView)
         
+        leftMarkHandlerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        leftMarkHandlerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -11).isActive = true
+        leftMarkHandlerView.widthAnchor.constraint(equalToConstant: handleWidth).isActive = true
+        leftMarkHandlerView.leftAnchor.constraint(equalTo: trimView.leftAnchor).isActive = true
+        
+        leftMarkImageView.translatesAutoresizingMaskIntoConstraints = false
+        leftMarkHandlerView.addSubview(leftMarkImageView)
+        
+        leftMarkHandlerView.topAnchor.constraint(equalTo: leftMarkHandlerView.topAnchor).isActive = true
+        leftMarkHandlerView.bottomAnchor.constraint(equalTo: leftMarkHandlerView.bottomAnchor).isActive = true
+        leftMarkImageView.widthAnchor.constraint(equalToConstant: 8).isActive = true
+        leftMarkImageView.centerXAnchor.constraint(equalTo: leftMarkHandlerView.centerXAnchor).isActive = true
+        
+        rightMarkHandlerView.isUserInteractionEnabled = true
+        rightMarkHandlerView.layer.cornerRadius = 2.0
+        rightMarkHandlerView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(rightMarkHandlerView)
+        
+        leftMarkHandlerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        leftMarkHandlerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -11).isActive = true
+        rightMarkHandlerView.widthAnchor.constraint(equalToConstant: handleWidth).isActive = true
+        rightMarkHandlerView.rightAnchor.constraint(equalTo: trimView.rightAnchor).isActive = true
+        
+        rightMarkImageView.translatesAutoresizingMaskIntoConstraints = false
+        leftMarkHandlerView.addSubview(rightMarkImageView)
+        
+        rightMarkImageView.topAnchor.constraint(equalTo: rightMarkHandlerView.topAnchor).isActive = true
+        rightMarkImageView.bottomAnchor.constraint(equalTo: rightMarkHandlerView.bottomAnchor).isActive = true
+        rightMarkImageView.widthAnchor.constraint(equalToConstant: 8).isActive = true
+        rightMarkImageView.centerXAnchor.constraint(equalTo: rightMarkHandlerView.centerXAnchor).isActive = true
+        
+        leftMarkHandlerView.layer.zPosition = 999
+        rightMarkHandlerView.layer.zPosition = 999
+    }
+    
+    
+    private func setupMaskView() {
         leftMaskView.isUserInteractionEnabled = false
         leftMaskView.backgroundColor = maskColor
         
@@ -196,23 +273,23 @@ public protocol TrimmerViewDelegate: class {
         insertSubview(leftMaskView, belowSubview: leftHandleView)
         
         leftMaskView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
-        leftMaskView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        leftMaskView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         leftMaskView.rightAnchor.constraint(equalTo: leftHandleView.centerXAnchor).isActive = true
+        leftMaskView.bottomAnchor.constraint(equalTo: assetPreview.bottomAnchor).isActive = true
+        leftMaskView.topAnchor.constraint(equalTo: assetPreview.topAnchor).isActive = true
         
         rightMaskView.isUserInteractionEnabled = false
         rightMaskView.backgroundColor = maskColor
         rightMaskView.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(rightMaskView, belowSubview: rightHandleView)
         
-        rightMaskView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
-        rightMaskView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        rightMaskView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         rightMaskView.leftAnchor.constraint(equalTo: rightHandleView.centerXAnchor).isActive = true
+        rightMaskView.rightAnchor.constraint(equalTo: rightAnchor, constant: 30).isActive = true
+        rightMaskView.bottomAnchor.constraint(equalTo: assetPreview.bottomAnchor).isActive = true
+        rightMaskView.topAnchor.constraint(equalTo: assetPreview.topAnchor).isActive = true
     }
     
     private func setupPositionBar() {
-        
+        positionBar.hitFramePoint = -10
         positionBar.frame = CGRect(x: 0, y: 0, width: 3, height: frame.height)
         positionBar.backgroundColor = positionBarColor
         positionBar.center = CGPoint(x: leftHandleView.frame.maxX, y: center.y)
@@ -232,14 +309,18 @@ public protocol TrimmerViewDelegate: class {
         let leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
         let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
         let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+        let leftMarkGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+        let rightMarkGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
         
         leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
         rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
         positionBar.addGestureRecognizer(positionBarPanGestureRecognizer)
+        leftMarkHandlerView.addGestureRecognizer(leftMarkGestureRecognizer)
+        rightMarkHandlerView.addGestureRecognizer(rightMarkGestureRecognizer)
     }
     
     private func updateMainColor() {
-        trimView.layer.borderColor = mainColor.cgColor
+        trimView.layer.borderColor = UIColor.clear.cgColor
         leftHandleView.backgroundColor = mainColor
         rightHandleView.backgroundColor = mainColor
     }
@@ -259,7 +340,10 @@ public protocol TrimmerViewDelegate: class {
                 currentRightConstraint = rightConstraint!.constant
             case positionBar:
                 currentPositionBarConstraint = positionConstraint!.constant
-                
+            case leftMarkHandlerView:
+                currentLeftConstraint = leftConstraint!.constant
+            case rightMarkHandlerView:
+                currentRightConstraint = rightConstraint!.constant
             default:
                 break
             }
@@ -268,9 +352,9 @@ public protocol TrimmerViewDelegate: class {
         case .changed:
             let translation = gestureRecognizer.translation(in: superView)
             switch view {
-            case leftHandleView:
+            case leftHandleView, leftMarkHandlerView:
                 updateLeftConstraint(with: translation)
-            case rightHandleView:
+            case rightHandleView, rightMarkHandlerView:
                 updateRightConstraint(with: translation)
             case positionBar:
                 updatePositionConstraint(with: translation)
@@ -281,11 +365,11 @@ public protocol TrimmerViewDelegate: class {
             layoutIfNeeded()
             
             switch view {
-            case leftHandleView:
+            case leftHandleView, rightMarkHandlerView:
                 if let startTime = startTime {
                     seek(to: startTime)
                 }
-            case rightHandleView:
+            case rightHandleView, rightMarkHandlerView:
                 if let endTime = endTime {
                     seek(to: endTime)
                 }
@@ -333,6 +417,7 @@ public protocol TrimmerViewDelegate: class {
     private func resetHandleViewPosition() {
         leftConstraint?.constant = 0
         rightConstraint?.constant = 0
+        positionConstraint?.constant = 0
         layoutIfNeeded()
     }
     
