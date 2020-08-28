@@ -54,6 +54,7 @@ public protocol TrimmerViewDelegate: class {
             leftHandleKnob.isHidden = isHiddenHandleViews
             rightHandleKnob.isHidden = isHiddenHandleViews
             trimView.isHidden = isHiddenHandleViews
+            isHandlesEnabled = isHiddenHandleViews ? false : isHandlesEnabled
         }
     }
     
@@ -64,6 +65,15 @@ public protocol TrimmerViewDelegate: class {
             rightMarkHandlerView.isHidden = isHiddenMarksHandleViews
             leftMarkImageView.isHidden = isHiddenMarksHandleViews
             rightMarkImageView.isHidden = isHiddenMarksHandleViews
+            isMarksEnabled = isHiddenMarksHandleViews ? false : isMarksEnabled
+        }
+    }
+    
+    /// The bool for position bar appearance on the side of the view
+    @IBInspectable public var isHiddenPositionBar: Bool = false {
+        didSet {
+            positionBar.isHidden = isHiddenPositionBar
+            isPositionBarEnabled = isHiddenPositionBar ? false : isPositionBarEnabled
         }
     }
     
@@ -72,6 +82,13 @@ public protocol TrimmerViewDelegate: class {
         didSet {
             leftHandleView.gestureRecognizers?.first?.isEnabled = isHandlesEnabled
             rightHandleView.gestureRecognizers?.first?.isEnabled = isHandlesEnabled
+        }
+    }
+    
+    /// The bool used to position bar views user interaction
+    @IBInspectable public var isPositionBarEnabled: Bool = true {
+        didSet {
+            positionBar.gestureRecognizers?.first?.isEnabled = isPositionBarEnabled
         }
     }
     
@@ -155,10 +172,11 @@ public protocol TrimmerViewDelegate: class {
         backgroundColor = UIColor.clear
         layer.zPosition = 1
         setupTrimmerView()
-        setupMarksHanlderView()
         setupHandleView()
         setupMaskView()
+        setupMarksHanlderView()
         setupPositionBar()
+        
         setupGestures()
         updateMainColor()
     }
@@ -168,6 +186,16 @@ public protocol TrimmerViewDelegate: class {
         assetPreview.rightAnchor.constraint(equalTo: rightAnchor, constant: -handleWidth).isActive = true
         assetPreview.topAnchor.constraint(equalTo: topAnchor, constant: 9).isActive = true
         assetPreview.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -9).isActive = true
+    }
+    
+    public func setHandleSubviewPosition(isSelectedMark: Bool) {
+        if isSelectedMark {
+            insertSubview(leftMarkHandlerView, aboveSubview: leftHandleView)
+            insertSubview(rightMarkHandlerView, aboveSubview: rightHandleView)
+        } else {
+            insertSubview(leftHandleView, aboveSubview: leftMarkHandlerView)
+            insertSubview(rightHandleView, aboveSubview: rightMarkHandlerView)
+        }
     }
     
     private func setupTrimmerView() {
@@ -237,8 +265,8 @@ public protocol TrimmerViewDelegate: class {
         leftMarkImageView.translatesAutoresizingMaskIntoConstraints = false
         leftMarkHandlerView.addSubview(leftMarkImageView)
         
-        leftMarkHandlerView.topAnchor.constraint(equalTo: leftMarkHandlerView.topAnchor).isActive = true
-        leftMarkHandlerView.bottomAnchor.constraint(equalTo: leftMarkHandlerView.bottomAnchor).isActive = true
+        leftMarkImageView.topAnchor.constraint(equalTo: leftMarkHandlerView.topAnchor).isActive = true
+        leftMarkImageView.bottomAnchor.constraint(equalTo: leftMarkHandlerView.bottomAnchor).isActive = true
         leftMarkImageView.widthAnchor.constraint(equalToConstant: 8).isActive = true
         leftMarkImageView.centerXAnchor.constraint(equalTo: leftMarkHandlerView.centerXAnchor).isActive = true
         
@@ -247,20 +275,19 @@ public protocol TrimmerViewDelegate: class {
         rightMarkHandlerView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(rightMarkHandlerView)
         
-        leftMarkHandlerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        leftMarkHandlerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -11).isActive = true
+        rightMarkHandlerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        rightMarkHandlerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -11).isActive = true
         rightMarkHandlerView.widthAnchor.constraint(equalToConstant: handleWidth).isActive = true
         rightMarkHandlerView.rightAnchor.constraint(equalTo: trimView.rightAnchor).isActive = true
         
         rightMarkImageView.translatesAutoresizingMaskIntoConstraints = false
-        leftMarkHandlerView.addSubview(rightMarkImageView)
+        rightMarkHandlerView.addSubview(rightMarkImageView)
         
         rightMarkImageView.topAnchor.constraint(equalTo: rightMarkHandlerView.topAnchor).isActive = true
         rightMarkImageView.bottomAnchor.constraint(equalTo: rightMarkHandlerView.bottomAnchor).isActive = true
         rightMarkImageView.widthAnchor.constraint(equalToConstant: 8).isActive = true
         rightMarkImageView.centerXAnchor.constraint(equalTo: rightMarkHandlerView.centerXAnchor).isActive = true
     }
-    
     
     private func setupMaskView() {
         leftMaskView.isUserInteractionEnabled = false
@@ -280,7 +307,7 @@ public protocol TrimmerViewDelegate: class {
         insertSubview(rightMaskView, belowSubview: rightHandleView)
         
         rightMaskView.leftAnchor.constraint(equalTo: rightHandleView.centerXAnchor).isActive = true
-        rightMaskView.rightAnchor.constraint(equalTo: rightAnchor, constant: 30).isActive = true
+        rightMaskView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
         rightMaskView.bottomAnchor.constraint(equalTo: assetPreview.bottomAnchor).isActive = true
         rightMaskView.topAnchor.constraint(equalTo: assetPreview.topAnchor).isActive = true
     }
@@ -362,7 +389,7 @@ public protocol TrimmerViewDelegate: class {
             layoutIfNeeded()
             
             switch view {
-            case leftHandleView, rightMarkHandlerView:
+            case leftHandleView, leftMarkHandlerView:
                 if let startTime = startTime {
                     seek(to: startTime)
                 }

@@ -19,6 +19,7 @@ class VideoTrimmerViewController: AssetSelectionViewController {
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var playerView: UIView!
     @IBOutlet weak var trimmerView: TrimmerView!
+    @IBOutlet weak var markButton: UIButton!
 
     var player: AVPlayer?
     var playbackTimeCheckerTimer: Timer?
@@ -34,7 +35,7 @@ class VideoTrimmerViewController: AssetSelectionViewController {
     @IBAction func selectAsset(_ sender: Any) {
         loadAssetRandomly()
     }
-
+    
     @IBAction func play(_ sender: Any) {
 
         guard let player = player else { return }
@@ -46,6 +47,15 @@ class VideoTrimmerViewController: AssetSelectionViewController {
             player.pause()
             stopPlaybackTimeChecker()
         }
+    }
+    
+    @IBAction func markButtonTapped(_ sender: UIButton) {
+        sender.isSelected.toggle()
+        
+        trimmerView.isHiddenHandleViews = sender.isSelected
+        trimmerView.isHiddenPositionBar = sender.isSelected
+        trimmerView.isHiddenMarksHandleViews = !sender.isSelected
+        trimmerView.setHandleSubviewPosition(isSelectedMark: sender.isSelected)
     }
 
     override func loadAsset(_ asset: AVAsset) {
