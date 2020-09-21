@@ -53,8 +53,9 @@ class VideoTrimmerViewController: AssetSelectionViewController {
         sender.isSelected.toggle()
         
         trimmerView.isHiddenHandleViews = sender.isSelected
-        trimmerView.isHiddenPositionBar = sender.isSelected
         trimmerView.isHiddenMarksHandleViews = !sender.isSelected
+        trimmerView.isHandlesEnabled = !sender.isSelected
+        trimmerView.isMarksEnabled = sender.isSelected
         trimmerView.setHandleSubviewPosition(isSelectedMark: sender.isSelected)
     }
 

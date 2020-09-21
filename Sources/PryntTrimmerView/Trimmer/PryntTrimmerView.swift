@@ -136,6 +136,7 @@ public protocol TrimmerViewDelegate: class {
     // MARK: Subviews
     
     private let trimView = UIView()
+    private let trimMarkView = UIView()
     private let leftHandleView = HandlerView()
     private let rightHandleView = HandlerView()
     private let positionBar = HandlerView()
@@ -152,6 +153,12 @@ public protocol TrimmerViewDelegate: class {
     
     private var currentLeftConstraint: CGFloat = .zero
     private var currentRightConstraint: CGFloat = .zero
+    
+    private var currentLeftMarkConstraint: CGFloat = .zero
+    private var currentRightMarkConstraint: CGFloat = .zero
+    private var leftMarkConstraint: NSLayoutConstraint?
+    private var rightMarkConstraint: NSLayoutConstraint?
+    
     private var currentPositionBarConstraint: CGFloat = .zero
     private var leftConstraint: NSLayoutConstraint?
     private var rightConstraint: NSLayoutConstraint?
@@ -172,6 +179,7 @@ public protocol TrimmerViewDelegate: class {
         backgroundColor = UIColor.clear
         layer.zPosition = 1
         setupTrimmerView()
+        setupTrimmerMarkView()
         setupHandleView()
         setupMaskView()
         setupMarksHanlderView()
@@ -211,6 +219,21 @@ public protocol TrimmerViewDelegate: class {
         rightConstraint = trimView.rightAnchor.constraint(equalTo: rightAnchor)
         leftConstraint?.isActive = true
         rightConstraint?.isActive = true
+    }
+    
+    private func setupTrimmerMarkView() {
+        trimMarkView.layer.borderWidth = 2.0
+        trimMarkView.layer.cornerRadius = 2.0
+        trimMarkView.translatesAutoresizingMaskIntoConstraints = false
+        trimMarkView.isUserInteractionEnabled = false
+        addSubview(trimMarkView)
+        
+        trimMarkView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        trimMarkView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        leftMarkConstraint = trimMarkView.leftAnchor.constraint(equalTo: leftAnchor)
+        rightMarkConstraint = trimMarkView.rightAnchor.constraint(equalTo: rightAnchor)
+        leftMarkConstraint?.isActive = true
+        rightMarkConstraint?.isActive = true
     }
     
     private func setupHandleView() {
@@ -260,7 +283,7 @@ public protocol TrimmerViewDelegate: class {
         leftMarkHandlerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         leftMarkHandlerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -11).isActive = true
         leftMarkHandlerView.widthAnchor.constraint(equalToConstant: handleWidth).isActive = true
-        leftMarkHandlerView.leftAnchor.constraint(equalTo: trimView.leftAnchor).isActive = true
+        leftMarkHandlerView.leftAnchor.constraint(equalTo: trimMarkView.leftAnchor).isActive = true
         
         leftMarkImageView.translatesAutoresizingMaskIntoConstraints = false
         leftMarkHandlerView.addSubview(leftMarkImageView)
@@ -278,7 +301,7 @@ public protocol TrimmerViewDelegate: class {
         rightMarkHandlerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         rightMarkHandlerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -11).isActive = true
         rightMarkHandlerView.widthAnchor.constraint(equalToConstant: handleWidth).isActive = true
-        rightMarkHandlerView.rightAnchor.constraint(equalTo: trimView.rightAnchor).isActive = true
+        rightMarkHandlerView.rightAnchor.constraint(equalTo: trimMarkView.rightAnchor).isActive = true
         
         rightMarkImageView.translatesAutoresizingMaskIntoConstraints = false
         rightMarkHandlerView.addSubview(rightMarkImageView)
@@ -345,6 +368,7 @@ public protocol TrimmerViewDelegate: class {
     
     private func updateMainColor() {
         trimView.layer.borderColor = UIColor.clear.cgColor
+        trimMarkView.layer.borderColor = UIColor.clear.cgColor
         leftHandleView.backgroundColor = mainColor
         rightHandleView.backgroundColor = mainColor
     }
@@ -365,9 +389,9 @@ public protocol TrimmerViewDelegate: class {
             case positionBar:
                 currentPositionBarConstraint = positionConstraint!.constant
             case leftMarkHandlerView:
-                currentLeftConstraint = leftConstraint!.constant
+                currentLeftMarkConstraint = leftMarkConstraint!.constant
             case rightMarkHandlerView:
-                currentRightConstraint = rightConstraint!.constant
+                currentRightMarkConstraint = rightMarkConstraint!.constant
             default:
                 break
             }
@@ -376,10 +400,14 @@ public protocol TrimmerViewDelegate: class {
         case .changed:
             let translation = gestureRecognizer.translation(in: superView)
             switch view {
-            case leftHandleView, leftMarkHandlerView:
+            case leftHandleView:
                 updateLeftConstraint(with: translation)
-            case rightHandleView, rightMarkHandlerView:
+            case leftMarkHandlerView:
+                updateLeftMarkConstraint(with: translation)
+            case rightHandleView:
                 updateRightConstraint(with: translation)
+            case rightMarkHandlerView:
+                updateRightMarkConstraint(with: translation)
             case positionBar:
                 updatePositionConstraint(with: translation)
             default:
@@ -389,12 +417,20 @@ public protocol TrimmerViewDelegate: class {
             layoutIfNeeded()
             
             switch view {
-            case leftHandleView, leftMarkHandlerView:
+            case leftHandleView:
                 if let startTime = startTime {
                     seek(to: startTime)
                 }
-            case rightHandleView, rightMarkHandlerView:
+            case rightHandleView:
                 if let endTime = endTime {
+                    seek(to: endTime)
+                }
+            case leftMarkHandlerView:
+                if let startTime = startMarkTime {
+                    seek(to: startTime)
+                }
+            case rightMarkHandlerView:
+                if let endTime = endMarkTime {
                     seek(to: endTime)
                 }
             case positionBar:
@@ -425,6 +461,18 @@ public protocol TrimmerViewDelegate: class {
         rightConstraint?.constant = newConstraint
     }
     
+    private func updateLeftMarkConstraint(with translation: CGPoint) {
+        let maxConstraint = max(rightMarkHandlerView.frame.origin.x - handleWidth - minimumDistanceBetweenHandle, 0)
+        let newConstraint = min(max(0, currentLeftMarkConstraint + translation.x), maxConstraint)
+        leftMarkConstraint?.constant = newConstraint
+    }
+    
+    private func updateRightMarkConstraint(with translation: CGPoint) {
+        let maxConstraint = min(2 * handleWidth - frame.width + leftMarkHandlerView.frame.origin.x + minimumDistanceBetweenHandle, 0)
+        let newConstraint = max(min(0, currentRightMarkConstraint + translation.x), maxConstraint)
+        rightMarkConstraint?.constant = newConstraint
+    }
+    
     private func updatePositionConstraint(with translation: CGPoint) {
         let maxConstraint = max(rightHandleView.frame.origin.x - handleWidth, 0)
         let newConstraint = min(max(0, currentPositionBarConstraint + translation.x), maxConstraint)
@@ -441,6 +489,9 @@ public protocol TrimmerViewDelegate: class {
     private func resetHandleViewPosition() {
         leftConstraint?.constant = 0
         rightConstraint?.constant = 0
+        
+        leftMarkConstraint?.constant = 0
+        rightMarkConstraint?.constant = 0
         layoutIfNeeded()
     }
     
@@ -465,6 +516,19 @@ public protocol TrimmerViewDelegate: class {
         }
     }
     
+    /// Set postion of marked views for the current asset
+    public func setMarkedTime(startTime: Double, endTime: Double) {
+        let startCMTime = CMTime(seconds: startTime, preferredTimescale: 1)
+        let endCMTime = CMTime(seconds: endTime, preferredTimescale: 1)
+        
+        guard let startPosition = getPosition(from: max(startCMTime, CMTime.zero)),
+            let durationTime = asset?.duration,
+            let endPosition = getPosition(from: max(durationTime - endCMTime, .zero)) else { return }
+        
+        leftMarkConstraint?.constant = startPosition
+        rightMarkConstraint?.constant = -endPosition
+    }
+    
     /// The selected start time for the current asset.
     public var startTime: CMTime? {
         let startPosition = leftHandleView.frame.origin.x + assetPreview.contentOffset.x
@@ -474,6 +538,18 @@ public protocol TrimmerViewDelegate: class {
     /// The selected end time for the current asset.
     public var endTime: CMTime? {
         let endPosition = rightHandleView.frame.origin.x + assetPreview.contentOffset.x - handleWidth
+        return getTime(from: endPosition)
+    }
+    
+    /// The selected start marked time for the current asset.
+    public var startMarkTime: CMTime? {
+        let startPosition = leftMarkHandlerView.frame.origin.x + assetPreview.contentOffset.x
+        return getTime(from: startPosition)
+    }
+    
+    /// The selected end marked time for the current asset.
+    public var endMarkTime: CMTime? {
+        let endPosition = rightMarkHandlerView.frame.origin.x + assetPreview.contentOffset.x - handleWidth
         return getTime(from: endPosition)
     }
     

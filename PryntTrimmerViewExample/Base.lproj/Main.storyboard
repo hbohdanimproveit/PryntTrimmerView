@@ -28,13 +28,17 @@
                                     <constraint firstAttribute="height" constant="56" id="e9q-qu-Rg9"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenHandleViews" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenHandleViews" value="NO"/>
                                     <userDefinedRuntimeAttribute type="color" keyPath="maskColor">
                                         <color key="value" white="0.0" alpha="0.30317478549999999" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHandlesEnabled" value="NO"/>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isMarksEnabled" value="YES"/>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenMarksHandleViews" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHandlesEnabled" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isMarksEnabled" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenMarksHandleViews" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenPositionBar" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isPositionBarEnabled" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="image" keyPath="leftMarkImage" value="left-marker-icon"/>
+                                    <userDefinedRuntimeAttribute type="image" keyPath="rightMarkImage" value="right-marker-icon"/>
                                 </userDefinedRuntimeAttributes>
                             </view>
                             <view alpha="0.80000000000000004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YaM-S0-qXi" userLabel="Bottom View">
@@ -213,4 +217,8 @@
             <point key="canvasLocation" x="32.799999999999997" y="832.53373313343332"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="left-marker-icon" width="8" height="51"/>
+        <image name="right-marker-icon" width="8" height="51"/>
+    </resources>
 </document>
