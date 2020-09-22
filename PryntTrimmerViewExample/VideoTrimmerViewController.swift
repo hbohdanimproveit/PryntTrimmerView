@@ -64,6 +64,8 @@ class VideoTrimmerViewController: AssetSelectionViewController {
         trimmerView.asset = asset
         trimmerView.delegate = self
         addVideoPlayer(with: asset, playerView: playerView)
+        trimmerView.setHandleSubviewPosition(isSelectedMark: false)
+
     }
 
     private func addVideoPlayer(with asset: AVAsset, playerView: UIView) {

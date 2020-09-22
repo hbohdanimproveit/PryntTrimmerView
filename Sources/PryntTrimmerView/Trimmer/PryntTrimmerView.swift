@@ -167,7 +167,7 @@ public protocol TrimmerViewDelegate: class {
     private let handleWidth: CGFloat = 15
     
     /// The minimum duration allowed for the trimming. The handles won't pan further if the minimum duration is attained.
-    public var minDuration: Double = 3
+    public var minDuration: Double = 0.2
     public var positionBarAnimationDuration: Double = 0.1
     
     // MARK: - View & constraints configurations
@@ -518,12 +518,20 @@ public protocol TrimmerViewDelegate: class {
     
     /// Set postion of marked views for the current asset
     public func setMarkedTime(startTime: Double, endTime: Double) {
-        let startCMTime = CMTime(seconds: startTime, preferredTimescale: 1)
-        let endCMTime = CMTime(seconds: endTime, preferredTimescale: 1)
+        let startCMTime = startTime.isZero
+            ? CMTime.zero
+            : CMTime(seconds: startTime, preferredTimescale: 1000)
+        
+        let endCMTime = endTime.isZero
+            ? CMTime.zero
+            : CMTime(seconds: endTime, preferredTimescale: 1000)
         
         guard let startPosition = getPosition(from: max(startCMTime, CMTime.zero)),
-            let durationTime = asset?.duration,
-            let endPosition = getPosition(from: max(durationTime - endCMTime, .zero)) else { return }
+            let duration = asset?.duration else { return }
+        
+        let endTimeDifference = endTime.isZero ? CMTime.zero : duration - endCMTime
+        
+        guard let endPosition = getPosition(from: max(endTimeDifference, .zero)) else { return }
         
         leftMarkConstraint?.constant = startPosition
         rightMarkConstraint?.constant = -endPosition
