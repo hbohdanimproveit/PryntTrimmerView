@@ -11,7 +11,7 @@ import UIKit
 
 class HandlerView: UIView {
 
-    var hitFramePoint: CGFloat = -30
+    var hitFramePoint: CGFloat = 0
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let hitFrame = bounds.insetBy(dx: hitFramePoint, dy: hitFramePoint)
