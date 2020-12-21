@@ -65,7 +65,7 @@ public protocol TrimmerViewDelegate: class {
     }
     
     /// Text font size of the mark label
-    @IBInspectable public var marksFontSize: CGFloat = 17 {
+    @IBInspectable public var marksFontSize: CGFloat = 16 {
         didSet {
             leftMarkLabel.font = UIFont.monospacedDigitSystemFont(ofSize: marksFontSize, weight: .regular)
             rightMarkLabel.font = UIFont.monospacedDigitSystemFont(ofSize: marksFontSize, weight: .regular)
@@ -349,8 +349,6 @@ public protocol TrimmerViewDelegate: class {
         
         leftMarkLabel.translatesAutoresizingMaskIntoConstraints = false
         rightMarkLabel.translatesAutoresizingMaskIntoConstraints = false
-        leftMarkLabel.text = "00.00"
-        rightMarkLabel.text = "00.00"
         
         leftMarkHandlerView.addSubview(leftMarkLabel)
         rightMarkHandlerView.addSubview(rightMarkLabel)
