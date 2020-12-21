@@ -601,8 +601,6 @@ public protocol TrimmerViewDelegate: class {
             ? CMTime.zero
             : CMTime(seconds: endTime, preferredTimescale: 1000)
         
-        leftMarkLabel.text = String(startCMTime.seconds)
-        rightMarkLabel.text = String(endCMTime.seconds)
         guard let startPosition = getPosition(from: max(startCMTime, CMTime.zero)),
             let duration = asset?.duration else { return }
         
@@ -612,6 +610,12 @@ public protocol TrimmerViewDelegate: class {
         
         leftMarkConstraint?.constant = startPosition
         rightMarkConstraint?.constant = -endPosition
+    }
+    
+    /// Set time of marked views for the current asset
+    public func setMarkedLabelTime(startTime: String, endTime: String) {
+        leftMarkLabel.text = startTime
+        rightMarkLabel.text = endTime
     }
     
     /// The selected start time for the current asset.
