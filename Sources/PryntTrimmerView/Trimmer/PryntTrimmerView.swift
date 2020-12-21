@@ -46,6 +46,40 @@ public protocol TrimmerViewDelegate: class {
         }
     }
     
+    /// Marks corner radius
+    @IBInspectable public var marksLabelRadius: CGFloat = 6 {
+        didSet {
+            leftMarkLabel.layer.cornerRadius = marksLabelRadius
+            rightMarkLabel.layer.cornerRadius = marksLabelRadius
+            leftMarkLabel.clipsToBounds = true
+            rightMarkLabel.clipsToBounds = true
+        }
+    }
+    
+    /// Text color of the mark label
+    @IBInspectable public var marksTextColor: UIColor = .white {
+        didSet {
+            leftMarkLabel.textColor = marksTextColor
+            rightMarkLabel.textColor = marksTextColor
+        }
+    }
+    
+    /// Text font size of the mark label
+    @IBInspectable public var marksFontSize: CGFloat = 17 {
+        didSet {
+            leftMarkLabel.font = UIFont.monospacedDigitSystemFont(ofSize: marksFontSize, weight: .regular)
+            rightMarkLabel.font = UIFont.monospacedDigitSystemFont(ofSize: marksFontSize, weight: .regular)
+        }
+    }
+    
+    /// Background color of the mark label
+    @IBInspectable public var marksBackgroundColor: UIColor = .blue {
+        didSet {
+            leftMarkLabel.backgroundColor = marksBackgroundColor
+            rightMarkLabel.backgroundColor = marksBackgroundColor
+        }
+    }
+    
     /// The bool for handles appearance on the side of the view
     @IBInspectable public var isHiddenHandleViews: Bool = false {
         didSet {
@@ -148,6 +182,8 @@ public protocol TrimmerViewDelegate: class {
     private let leftMarkImageView = UIImageView()
     private let rightMarkImageView = UIImageView()
     private let rightMaskView = UIView()
+    private let leftMarkLabel = UILabel()
+    private let rightMarkLabel = UILabel()
     
     // MARK: Constraints
     
@@ -310,6 +346,37 @@ public protocol TrimmerViewDelegate: class {
         rightMarkImageView.bottomAnchor.constraint(equalTo: rightMarkHandlerView.bottomAnchor).isActive = true
         rightMarkImageView.widthAnchor.constraint(equalToConstant: 8).isActive = true
         rightMarkImageView.centerXAnchor.constraint(equalTo: rightMarkHandlerView.centerXAnchor).isActive = true
+        
+        leftMarkLabel.translatesAutoresizingMaskIntoConstraints = false
+        rightMarkLabel.translatesAutoresizingMaskIntoConstraints = false
+        leftMarkLabel.text = "00.00"
+        rightMarkLabel.text = "00.00"
+        
+        leftMarkHandlerView.addSubview(leftMarkLabel)
+        rightMarkHandlerView.addSubview(rightMarkLabel)
+
+        leftMarkLabel.heightAnchor.constraint(equalToConstant: 21).isActive = true
+        leftMarkLabel.bottomAnchor.constraint(equalTo: leftMarkHandlerView.topAnchor, constant: 20).isActive = true
+        leftMarkLabel.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        leftMarkLabel.centerXAnchor.constraint(equalTo: leftMarkHandlerView.centerXAnchor, constant: 2).isActive = true
+        
+        rightMaskView.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        rightMarkLabel.bottomAnchor.constraint(equalTo: rightMarkHandlerView.topAnchor, constant: 20).isActive = true
+        rightMarkLabel.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        rightMarkLabel.centerXAnchor.constraint(equalTo: rightMarkHandlerView.centerXAnchor, constant: -2).isActive = true
+        
+        leftMarkLabel.textAlignment = .center
+        rightMarkLabel.textAlignment = .center
+        leftMarkLabel.backgroundColor = marksBackgroundColor
+        rightMarkLabel.backgroundColor = marksBackgroundColor
+        leftMarkLabel.font = UIFont.monospacedDigitSystemFont(ofSize: marksFontSize, weight: .regular)
+        rightMarkLabel.font = UIFont.monospacedDigitSystemFont(ofSize: marksFontSize, weight: .regular)
+        leftMarkLabel.textColor = marksTextColor
+        rightMarkLabel.textColor = marksTextColor
+        leftMarkLabel.layer.cornerRadius = marksLabelRadius
+        rightMarkLabel.layer.cornerRadius = marksLabelRadius
+        leftMarkLabel.clipsToBounds = true
+        rightMarkLabel.clipsToBounds = true
     }
     
     private func setupMaskView() {
@@ -383,14 +450,22 @@ public protocol TrimmerViewDelegate: class {
         case .began:
             switch view {
             case leftHandleView:
+                leftHandleView.layer.zPosition = 1
+                rightHandleView.layer.zPosition = .zero
                 currentLeftConstraint = leftConstraint!.constant
             case rightHandleView:
+                rightHandleView.layer.zPosition = 1
+                leftHandleView.layer.zPosition = .zero
                 currentRightConstraint = rightConstraint!.constant
             case positionBar:
                 currentPositionBarConstraint = positionConstraint!.constant
             case leftMarkHandlerView:
+                leftMarkHandlerView.layer.zPosition = 1
+                rightMarkHandlerView.layer.zPosition = .zero
                 currentLeftMarkConstraint = leftMarkConstraint!.constant
             case rightMarkHandlerView:
+                rightMarkHandlerView.layer.zPosition = 1
+                leftMarkHandlerView.layer.zPosition = .zero
                 currentRightMarkConstraint = rightMarkConstraint!.constant
             default:
                 break
@@ -526,6 +601,8 @@ public protocol TrimmerViewDelegate: class {
             ? CMTime.zero
             : CMTime(seconds: endTime, preferredTimescale: 1000)
         
+        leftMarkLabel.text = String(startCMTime.seconds)
+        rightMarkLabel.text = String(endCMTime.seconds)
         guard let startPosition = getPosition(from: max(startCMTime, CMTime.zero)),
             let duration = asset?.duration else { return }
         
