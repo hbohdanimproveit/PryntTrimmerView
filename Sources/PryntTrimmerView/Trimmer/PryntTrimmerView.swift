@@ -200,7 +200,9 @@ public protocol TrimmerViewDelegate: class {
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
     private var isHandlesViewEnabled: Bool = false
-    private let handleWidth: CGFloat = 15
+    private var handleWidth: CGFloat = 15
+    private let trimmerHandleWidth: CGFloat = 15
+    private let markHandleWidth: CGFloat = 30
     
     /// The minimum duration allowed for the trimming. The handles won't pan further if the minimum duration is attained.
     public var minDuration: Double = 0.2
@@ -358,10 +360,10 @@ public protocol TrimmerViewDelegate: class {
         leftMarkLabel.widthAnchor.constraint(equalToConstant: 50).isActive = true
         leftMarkLabel.centerXAnchor.constraint(equalTo: leftMarkHandlerView.centerXAnchor, constant: 2).isActive = true
         
-        rightMaskView.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        rightMarkLabel.heightAnchor.constraint(equalToConstant: 21).isActive = true
         rightMarkLabel.bottomAnchor.constraint(equalTo: rightMarkHandlerView.topAnchor, constant: 20).isActive = true
         rightMarkLabel.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        rightMarkLabel.centerXAnchor.constraint(equalTo: rightMarkHandlerView.centerXAnchor, constant: -2).isActive = true
+        rightMarkLabel.centerXAnchor.constraint(equalTo: rightMarkHandlerView.centerXAnchor, constant: 2).isActive = true
         
         leftMarkLabel.textAlignment = .center
         rightMarkLabel.textAlignment = .center
@@ -680,5 +682,9 @@ public protocol TrimmerViewDelegate: class {
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateSelectedTime(stoppedMoving: false)
+    }
+    
+    public func changeHandlerView(isEnubledMarks: Bool = false) {
+        handleWidth = isEnubledMarks ? markHandleWidth : trimmerHandleWidth
     }
 }
