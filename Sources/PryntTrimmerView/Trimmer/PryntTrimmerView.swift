@@ -418,11 +418,11 @@ public protocol TrimmerViewDelegate: class {
     }
     
     private func setupGestures() {
-        let leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-        let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-        let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-        let leftMarkGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
-        let rightMarkGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
+        let leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        let positionBarPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        let leftMarkGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        let rightMarkGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         
         leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
         rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
@@ -458,10 +458,12 @@ public protocol TrimmerViewDelegate: class {
             case positionBar:
                 currentPositionBarConstraint = positionConstraint!.constant
             case leftMarkHandlerView:
+                print("leftMarkHandlerView began touch")
                 leftMarkHandlerView.layer.zPosition = 1
                 rightMarkHandlerView.layer.zPosition = .zero
                 currentLeftMarkConstraint = leftMarkConstraint!.constant
             case rightMarkHandlerView:
+                print("rightMarkHandlerView began touch")
                 rightMarkHandlerView.layer.zPosition = 1
                 leftMarkHandlerView.layer.zPosition = .zero
                 currentRightMarkConstraint = rightMarkConstraint!.constant
@@ -476,10 +478,12 @@ public protocol TrimmerViewDelegate: class {
             case leftHandleView:
                 updateLeftConstraint(with: translation)
             case leftMarkHandlerView:
+                print("leftMarkHandlerView changed touch")
                 updateLeftMarkConstraint(with: translation)
             case rightHandleView:
                 updateRightConstraint(with: translation)
             case rightMarkHandlerView:
+                print("rightMarkHandlerView changed touch")
                 updateRightMarkConstraint(with: translation)
             case positionBar:
                 updatePositionConstraint(with: translation)
