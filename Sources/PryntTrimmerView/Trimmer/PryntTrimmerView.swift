@@ -200,7 +200,7 @@ public protocol TrimmerViewDelegate: class {
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
     private var isHandlesViewEnabled: Bool = false
-    private var handleWidth: CGFloat = 23
+    private var handleWidth: CGFloat = 30
     
     /// The minimum duration allowed for the trimming. The handles won't pan further if the minimum duration is attained.
     public var minDuration: Double = 0.2
