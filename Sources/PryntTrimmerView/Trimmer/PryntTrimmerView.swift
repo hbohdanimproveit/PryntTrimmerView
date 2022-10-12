@@ -205,7 +205,8 @@ public protocol TrimmerViewDelegate: class {
     /// The minimum duration allowed for the trimming. The handles won't pan further if the minimum duration is attained.
     public var minDuration: Double = 0.2
     public var positionBarAnimationDuration: Double = 0.1
-    
+    private var maxVideoDuration = Double.greatestFiniteMagnitude
+
     // MARK: - View & constraints configurations
     
     override func setupSubviews() {
@@ -240,6 +241,11 @@ public protocol TrimmerViewDelegate: class {
             insertSubview(leftHandleView, aboveSubview: leftMarkHandlerView)
             insertSubview(rightHandleView, aboveSubview: rightMarkHandlerView)
         }
+    }
+    
+    public func setMaxVideoDurationWith(seconds: Double) {
+        maxVideoDuration = seconds
+        positionRightHandleWith(seconds: seconds)
     }
     
     private func setupTrimmerView() {
@@ -458,12 +464,10 @@ public protocol TrimmerViewDelegate: class {
             case positionBar:
                 currentPositionBarConstraint = positionConstraint!.constant
             case leftMarkHandlerView:
-                print("leftMarkHandlerView began touch")
                 leftMarkHandlerView.layer.zPosition = 1
                 rightMarkHandlerView.layer.zPosition = .zero
                 currentLeftMarkConstraint = leftMarkConstraint!.constant
             case rightMarkHandlerView:
-                print("rightMarkHandlerView began touch")
                 rightMarkHandlerView.layer.zPosition = 1
                 leftMarkHandlerView.layer.zPosition = .zero
                 currentRightMarkConstraint = rightMarkConstraint!.constant
@@ -478,12 +482,10 @@ public protocol TrimmerViewDelegate: class {
             case leftHandleView:
                 updateLeftConstraint(with: translation)
             case leftMarkHandlerView:
-                print("leftMarkHandlerView changed touch")
                 updateLeftMarkConstraint(with: translation)
             case rightHandleView:
                 updateRightConstraint(with: translation)
             case rightMarkHandlerView:
-                print("rightMarkHandlerView changed touch")
                 updateRightMarkConstraint(with: translation)
             case positionBar:
                 updatePositionConstraint(with: translation)
@@ -530,12 +532,18 @@ public protocol TrimmerViewDelegate: class {
         let maxConstraint = max(rightHandleView.frame.origin.x - handleWidth - minimumDistanceBetweenHandle, 0)
         let newConstraint = min(max(0, currentLeftConstraint + translation.x), maxConstraint)
         leftConstraint?.constant = newConstraint
+        if endTime!.seconds - startTime!.seconds > maxVideoDuration {
+            positionRightHandleWith(seconds: startTime!.seconds + maxVideoDuration)
+        }
     }
     
     private func updateRightConstraint(with translation: CGPoint) {
         let maxConstraint = min(2 * handleWidth - frame.width + leftHandleView.frame.origin.x + minimumDistanceBetweenHandle, 0)
         let newConstraint = max(min(0, currentRightConstraint + translation.x), maxConstraint)
         rightConstraint?.constant = newConstraint
+        if endTime!.seconds - startTime!.seconds > maxVideoDuration {
+            positionLeftHandleWith(seconds: endTime!.seconds - maxVideoDuration)
+        }
     }
     
     private func updateLeftMarkConstraint(with translation: CGPoint) {
@@ -554,6 +562,24 @@ public protocol TrimmerViewDelegate: class {
         let maxConstraint = max(rightHandleView.frame.origin.x - handleWidth, 0)
         let newConstraint = min(max(0, currentPositionBarConstraint + translation.x), maxConstraint)
         positionConstraint?.constant = newConstraint
+    }
+    
+    private func positionLeftHandleWith(seconds: Double) {
+        let newStartTime = CMTimeMakeWithSeconds(Float64(seconds),
+                                                 preferredTimescale: asset!.duration.timescale)
+        let newPosition = getPosition(from: newStartTime)!
+        leftConstraint?.constant = newPosition
+    }
+    
+    private func positionRightHandleWith(seconds: Double) {
+        if seconds >= asset!.duration.seconds {
+            rightConstraint?.constant = 0
+        } else {
+            let newEndTime = CMTimeMakeWithSeconds(Float64(seconds),
+                                                   preferredTimescale: asset!.duration.timescale)
+            let newPosition = getPosition(from: newEndTime)!
+            rightConstraint?.constant = newPosition - durationSize
+        }
     }
     
     // MARK: - Asset loading
